@@ -4,6 +4,8 @@ services:
     build:
       context: ./frontoffice/
       dockerfile: ./docker/Dockerfile
+    volumes:
+      - ./frontoffice:/app
     networks:
       - frontToBack
     ports:
