@@ -1,28 +1,43 @@
-<script setup lang="ts">
+<script lang="ts">
   import {LoginService} from "~/services/login.service";
   import {User} from "~/entities/User";
 
-  const loginService = new LoginService();
+  export default {
+    setup() {
+      const loginService = new LoginService();
 
-  const isLoginMode = ref(true);
-  const form = reactive({
-    email: '',
-    password: '',
-  });
+      const isLoginMode = ref(true);
+      const form = reactive({
+        email: '',
+        password: '',
+      });
 
-  const toggleMode = () => {
-    isLoginMode.value = !isLoginMode.value;
-  };
+      const toggleMode = () => {
+        isLoginMode.value = !isLoginMode.value;
+      };
 
-  const handleSubmit = () => {
-    const user = new User({...form});
-    if (isLoginMode.value) {
-      loginService.login(user);
-    } else {
-      loginService.register(user)
-      isLoginMode.value = true;
+      const handleSubmit = () => {
+        const user = new User({...form});
+        if (isLoginMode.value) {
+          loginService.login(user);
+        } else {
+          loginService.register(user)
+          isLoginMode.value = true;
+        }
+      };
+
+      return  {
+        isLoginMode,
+        form,
+        toggleMode,
+        handleSubmit
+      }
     }
-  };
+  }
+
+
+
+
 </script>
 
 <template>

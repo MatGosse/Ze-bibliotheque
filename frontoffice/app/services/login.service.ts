@@ -24,10 +24,12 @@ export class LoginService {
         useCookie('auth_token').value = data.value.token;
 
         await navigateTo('/');
-        this.toast.success({ title: 'Connection Réussis', message: 'Vous pouvez maintenant publier ou modifier les ressources.' })
+        this.toast.success({ title: 'Connection réussis', message: 'Vous pouvez maintenant publier ou modifier les ressources.' })
     }
 
     public async register(user: Partial<User>): Promise<void>{
-        await this.apiService.post(User, user,'registration');
+        this.apiService.post(User, user,'registration').then(()=>{
+            this.toast.success({ title: 'Compte crée', message: 'Vous devez vous connecter pour publier ou modifier les ressources.' })
+        });
     }
 }
