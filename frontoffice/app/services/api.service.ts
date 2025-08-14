@@ -49,12 +49,7 @@ export class ApiService {
         entityClass: new (...args: never[]) => T,
         id: number,
         entrypoint?: string
-    ): Promise<{
-        '@context': string,
-        '@id': string,
-        '@type': string,
-        member: T
-    }> {
+    ): Promise<T> {
         const domain = entrypoint ?? entityClass.name.toLowerCase();
         const url = `${this.BASE_URL}/${domain}/${id}`;
 
