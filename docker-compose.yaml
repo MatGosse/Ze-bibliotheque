@@ -1,0 +1,50 @@
+
+services:
+  frontoffice:
+    build:
+      context: ./frontoffice/
+      dockerfile: ./docker/Dockerfile
+    networks:
+      - frontToBack
+    ports:
+      - "3000:3000"
+    environment:
+      - NUXT_PUBLIC_API_BASE_URL=http://api/api
+
+  api:
+    build:
+      context: ./api/
+      dockerfile: ./docker/Dockerfile
+    volumes:
+      - ./api:/var/www/html
+    networks:
+      - frontToBack
+      - databaseToBack
+    depends_on:
+      - database
+    ports:
+      - "8000:80"
+
+
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_DB: dev
+      POSTGRES_PASSWORD: dev
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+    networks:
+      - databaseToBack
+    ports:
+      - "5432:5432"
+
+volumes:
+  database_data:
+
+networks:
+  frontToBack:
+    driver: bridge
+  databaseToBack:
+    driver: bridge
+
