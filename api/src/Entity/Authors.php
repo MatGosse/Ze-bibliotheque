@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AuthorsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,6 +25,7 @@ class Authors
 
     #[ORM\Column(length: 255)]
     #[Groups(['books:read'])]
+    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     private ?string $name = null;
 
     /**

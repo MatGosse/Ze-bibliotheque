@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CategoriesRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,6 +23,7 @@ class Categories
 
     #[ORM\Column(length: 255)]
     #[Groups(['books:read'])]
+    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     private ?string $name = null;
 
     public function getId(): ?int

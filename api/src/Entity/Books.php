@@ -26,6 +26,7 @@ class Books
 
     #[ORM\Column(length: 255)]
     #[Groups(['books:read'])]
+    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'books')]

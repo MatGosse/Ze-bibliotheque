@@ -1,106 +1,116 @@
 <script lang="ts">
-  import type {AbstractEntity} from "~/entities/AbstractEntity";
-  import {onMounted, ref, computed} from "vue";
-  import {ApiService} from "~/services/api.service";
+import type {AbstractEntity} from "~/entities/AbstractEntity";
+import {onMounted, ref, computed} from "vue";
+import {ApiService} from "~/services/api.service";
+import type {Books} from "~/entities/Books";
 
-  export default {
-    props: {
-      listName: {
-        type: String,
-        required: true,
-      },
-      resource: {
-        type: [Function, Object] as PropType<new () => AbstractEntity>,
-        required: true,
-      },
-      bind: {
-        type: Object as PropType<{ title: string; author: string; year: string; category: string }>,
-        required: true,
-      },
+export default {
+  props: {
+    listName: {
+      type: String,
+      required: true,
     },
-    setup(props) {
-      const router = useRouter()
+    resource: {
+      type: [Function, Object] as PropType<new () => AbstractEntity>,
+      required: true,
+    },
+    bind: {
+      type: Object as PropType<{ title: string; author: string; year: string; category: string }>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const router = useRouter()
 
-      const items = ref<AbstractEntity[]>([]);
-      const currentPage = ref(1);
-      const itemsPerPage = ref(10);
-      const totalItems = ref(0);
-      const apiService = new ApiService();
+    const items = ref<AbstractEntity[]>([]);
+    const currentPage = ref(1);
+    const itemsPerPage = ref(10);
+    const totalItems = ref(0);
+    const searchQuery = ref('');
+    const apiService = new ApiService();
 
-      const fetchItems = async (page: number) => {
-        const response = await apiService.getAll(props.resource, page);
-        console.log(response)
+    const fetchItems = async (page: number, query: string = '') => {
+      if (query === "") {
+       const response = await apiService.getAll(props.resource, page);
         items.value = response.member;
-        console.log(items.value)
-
-        // Ne change pas itemsPerPage ici !
         totalItems.value = response.totalItems || 0;
-      };
+        return
+      }
+      const response = await apiService.getAll(props.resource, page, { name: query});
+      items.value = response.member;
+      totalItems.value = response.totalItems || 0;
+    };
 
-      onMounted(async () => {
-        await fetchItems(currentPage.value);
-      });
+    onMounted(async () => {
+      await fetchItems(currentPage.value);
+    });
 
-      const totalPages = computed(() => {
-        return Math.ceil(totalItems.value / itemsPerPage.value);
-      });
+    const totalPages = computed(() => {
+      return Math.ceil(totalItems.value / itemsPerPage.value);
+    });
 
-      const goToPage = (page: number) => {
-        if (page >= 1 && page <= totalPages.value && page !== currentPage.value) {
-          currentPage.value = page;
-          fetchItems(page);
-        }
-      };
+    const goToPage = (page: number) => {
+      if (page >= 1 && page <= totalPages.value && page !== currentPage.value) {
+        currentPage.value = page;
+        fetchItems(page, searchQuery.value);
+      }
+    };
 
-      const nextPage = () => {
-        if (currentPage.value < totalPages.value) {
-          goToPage(currentPage.value + 1);
-        }
-      };
+    const nextPage = () => {
+      if (currentPage.value < totalPages.value) {
+        goToPage(currentPage.value + 1);
+      }
+    };
 
-      const prevPage = () => {
-        if (currentPage.value > 1) {
-          goToPage(currentPage.value - 1);
-        }
-      };
+    const prevPage = () => {
+      if (currentPage.value > 1) {
+        goToPage(currentPage.value - 1);
+      }
+    };
 
-      const getNestedProperty = (obj: AbstractEntity, path: string) => {
-        const value = path.split('.').reduce((acc, part) => {
-          if (acc === null || acc === undefined) return acc;
-          return acc[part];
-        }, obj);
+    const handleSearch = () => {
+      currentPage.value = 1;
+      fetchItems(1, searchQuery.value);
+    };
 
-        if (Array.isArray(value)) {
-          return value.map(item=>item.name).join(', ');
-        }
+    const getNestedProperty = (obj: AbstractEntity, path: string) => {
+      const value = path.split('.').reduce((acc, part) => {
+        if (acc === null || acc === undefined) return acc;
+        return acc[part];
+      }, obj);
 
-        return value;
+      if (Array.isArray(value)) {
+        return value.map(item=>item.name).join(', ');
       }
 
-      const createNewEntity = () => {
-        router.push(`/${props.resource.name.toLowerCase()}/create`)
-      }
+      return value;
+    }
 
-      const editEntity = (id: number) => {
-        router.push(`/${props.resource.name.toLowerCase()}/${id}`)
-      }
+    const createNewEntity = () => {
+      router.push(`/${props.resource.name.toLowerCase()}/create`)
+    }
 
+    const editEntity = (id: number) => {
+      router.push(`/${props.resource.name.toLowerCase()}/${id}`)
+    }
 
-      return {
-        items,
-        currentPage,
-        itemsPerPage,
-        totalPages,
-        totalItems,
-        nextPage,
-        prevPage,
-        goToPage,
-        getNestedProperty,
-        createNewEntity,
-        editEntity
-      }
+    return {
+      items,
+      currentPage,
+      itemsPerPage,
+      totalPages,
+      totalItems,
+      searchQuery,
+      nextPage,
+      prevPage,
+      goToPage,
+      handleSearch,
+      getNestedProperty,
+      createNewEntity,
+      editEntity
     }
   }
+}
 </script>
 
 <template>
@@ -109,11 +119,36 @@
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-900">{{ listName }}</h1>
         <button @click="createNewEntity"
-                class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
           Créer un nouveau
         </button>
       </div>
-      <!-- Items list -->
+
+      <div class="mb-6">
+        <div class="flex items-center gap-2">
+          <div class="relative flex-grow">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <input
+                v-model="searchQuery"
+                @keyup.enter="handleSearch"
+                type="text"
+                class="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400 transition-all duration-200"
+                placeholder="Rechercher..."
+            />
+          </div>
+          <button
+              @click="handleSearch"
+              class="px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-colors duration-200 flex items-center"
+          >
+            <span>Rechercher</span>
+          </button>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <div
             v-for="(item, index) in items"
@@ -129,7 +164,7 @@
                 {{ getNestedProperty(item, bind.category) }}
               </span>
               <button
-                  class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
                   @click="editEntity(+item.id)"
               >
                 Voir
@@ -139,7 +174,6 @@
         </div>
       </div>
 
-      <!-- Pagination -->
       <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
         <div class="flex flex-1 justify-between sm:hidden">
           <button
@@ -182,7 +216,6 @@
                 </svg>
               </button>
 
-              <!-- Page numbers -->
               <template v-for="page in totalPages" :key="page">
                 <button
                     v-if="Math.abs(page - currentPage) <= 2 || page === 1 || page === totalPages"
