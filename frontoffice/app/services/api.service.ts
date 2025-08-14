@@ -100,8 +100,6 @@ export class ApiService {
     ): Promise<T> {
         const domain = entrypoint ?? entityClass.name.toLowerCase();
         const url = `${this.BASE_URL}/${domain}/${id}`;
-        console.log(payload)
-
         try {
             const response = await fetch(url, {
                 method: 'PATCH',
@@ -114,6 +112,27 @@ export class ApiService {
             });
 
             return this.handleResponse(response);
+        } catch (error) {
+            throw new Error(`Erreur API (${domain}): ${error}`);
+        }
+    }
+
+    public async delete<T extends AbstractEntity>(
+        entityClass: new (...args: never[]) => T,
+        id: number,
+        entrypoint?: string
+    ): Promise<void> {
+        const domain = entrypoint ?? entityClass.name.toLowerCase();
+        const url = `${this.BASE_URL}/${domain}/${id}`;
+
+        try {
+            await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/ld+json'
+                }
+            })
         } catch (error) {
             throw new Error(`Erreur API (${domain}): ${error}`);
         }
