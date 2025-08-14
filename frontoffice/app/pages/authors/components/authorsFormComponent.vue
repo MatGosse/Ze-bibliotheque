@@ -164,9 +164,9 @@ export default defineComponent({
           <button
               type="button"
               class="inline-flex justify-center rounded-lg border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              @click="$router.push('/')"
+              @click="$router.push('/authors')"
           >
-            Retour à l'accueil
+            Retour à liste
           </button>
 
           <div class="flex space-x-2" v-if="!isDisabled">
