@@ -1,0 +1,51 @@
+parameters:
+  #####################################################################################
+  # Mailer options
+  #####################################################################################
+  mailer_fromaddr: '%env(MAILER_FROM)%'
+  mailer_dsn: '%env(MAILER_DSN)%'
+
+  #####################################################################################
+  # API / Front interactions
+  #####################################################################################
+  frontoffice_url: '%env(FRONTOFFICE_URL)%'
+  backoffice_url: '%env(BACKOFFICE_URL)%'
+  api_url: '%env(STACK_API_URL)%'
+
+  #####################################################################################
+  # Database configuration
+  #####################################################################################
+
+  # In prod mode, we use secrets for database username and password
+  database_user: '%env(default:default_database_user:file:SECRETFILE_DATABASE_USERNAME)%'
+  database_password: '%env(default:default_database_password:file:SECRETFILE_DATABASE_PASSWORD)%'
+  database_host: '%env(default:default_database_host:DATABASE_HOST)%'
+  database_port: '%env(default:default_database_port:int:DATABASE_PORT)%'
+  database_name: '%env(default:default_database_name:DATABASE_NAME)%'
+
+  # Fallback for parameters used in DATABASE_URL env var
+  default_database_user: 'dev'
+  default_database_password: 'dev'
+  default_database_host: database
+  default_database_port: 5432
+  default_database_name: 'dev'
+
+  ####################################################################################
+  # Project configuration
+  ####################################################################################
+
+  #####################################################################################
+  # Mailer / SMS options. See notifier.yaml and mailer.yaml for the rest. They use
+  #                       They use MAILER_DSN, MAILER_FROM, FAKE_SMS_DSN and SPOTHIT_DSN
+  #####################################################################################
+  notification.channels: '%env(csv:NOTIFICATION_CHANNELS)%'
+
+  #####################################################################################
+  # VichUploader
+  #####################################################################################
+  app.path.photos: /images/photos
+
+
+when@test:
+  parameters:
+    default_database_name: 'test'
