@@ -6,11 +6,15 @@ export default defineNuxtConfig({
     modules: [
         '@nuxt/eslint',
         '@nuxt/ui',
-        'nuxt-toast'
+        'nuxt-toast',
+        '@pinia/nuxt'
     ],
     vite: {
         plugins: [
             tailwindcss()
         ]
+    },
+    pinia: {
+       autoImport: true
     },
 })

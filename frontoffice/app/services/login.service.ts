@@ -1,11 +1,13 @@
 import {ApiService} from "~/services/api.service";
 import {User} from "~/entities/User";
+import {useAuthStore} from "~/stores/auth";
 
 export class LoginService {
     private apiService= new ApiService()
     private toast = useToast()
 
     public async login(user:User): Promise<void> {
+        const authStore = useAuthStore()
 
         // send request
         const { data, error } = await useFetch<{ token: string }>(`${this.apiService.BASE_URL}/login_check`, {
@@ -21,7 +23,7 @@ export class LoginService {
             throw new Error(`Aucune donnée retournée par l'API ()`);
         }
         // store token
-        useCookie('auth_token').value = data.value.token;
+        authStore.setToken(data.value.token);
 
         await navigateTo('/');
         this.toast.success({ title: 'Connection réussis', message: 'Vous pouvez maintenant publier ou modifier les ressources.' })

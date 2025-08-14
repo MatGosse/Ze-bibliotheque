@@ -2,6 +2,7 @@
 import { ApiService } from "~/services/api.service";
 import { computed } from "vue";
 import { Categories } from "~/entities/Categories";
+import {useAuthStore} from "~/stores/auth";
 
 export default defineComponent({
   props: {
@@ -15,11 +16,13 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const authToken = useCookie('auth_token').value;
-    const isDisabled = computed(() => !authToken);
+    const storeToken= useAuthStore()
+    const authToken = computed(() => storeToken.isAuthenticated)
+
+    const isDisabled = computed(() => !authToken.value);
     const router = useRouter();
 
-    const apiService = new ApiService(authToken || '');
+    const apiService = new ApiService(storeToken.authToken || '');
     const toast = useToast();
 
     const category = reactive<Partial<Categories>>({
