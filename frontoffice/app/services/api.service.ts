@@ -10,13 +10,15 @@ export class ApiService {
     }
 
     private async handleResponse<T>(response: Response): Promise<T> {
+        console.log(response.ok)
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
+            console.log(errorData)
             this.toast.error({
                 title: 'Erreur',
                 message: errorData.description // @Todo create a service to translate errors to the user
             })
-            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            throw new Error(errorData.description || `HTTP error! status: ${response.status}`);
         }
         return response.json();
     }

@@ -28,8 +28,9 @@
         if (isLoginMode.value) {
           loginService.login(user);
         } else {
-          loginService.register(user)
-          isLoginMode.value = true;
+          loginService.register(user).then(()=>{
+            isLoginMode.value = true;
+          })
         }
       };
 

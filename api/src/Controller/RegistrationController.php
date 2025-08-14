@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,8 +54,14 @@ final class RegistrationController extends AbstractController
         $user->setPassword($hashedPassword);
 
         //save user in db
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        try {
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        }catch (UniqueConstraintViolationException $e) {
+            return new JsonResponse([
+                'description' => 'Email already exists.'
+            ], 409);
+        }
 
         // return response to user
         return $this->json([
