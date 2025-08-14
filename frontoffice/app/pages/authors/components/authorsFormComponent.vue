@@ -35,9 +35,12 @@ export default defineComponent({
       name: '',
     });
 
-    async function fetchAuthor(id: number) {
-      const authorData = await apiService.get(Authors, id);
-      author.name = authorData.name;
+    function fetchAuthor(id: number) {
+      apiService.get(Authors, id).then(authorData=>{
+        author.name = authorData.name;
+      }).catch(async ()=>{
+        await router.push('/authors')
+      });
     }
 
     async function fetchBooks(page = 1) {

@@ -35,11 +35,14 @@ export default defineComponent({
       categories: [] as string[]
     });
 
-    async function fetchBook(id: number) {
-      const bookData = (await apiService.get(Books, id));
-      book.name = bookData.name;
-      book.author = (bookData.author as Authors)["@id"];
-      book.categories = (bookData.categories as Categories[]).map(category => (category['@id'] as string)) || [];
+    function fetchBook(id: number) {
+      apiService.get(Books, id).then(bookData=>{
+        book.name = bookData.name;
+        book.author = (bookData.author as Authors)["@id"];
+        book.categories = (bookData.categories as Categories[]).map(category => (category['@id'] as string)) || [];
+      }).catch(async ()=>{
+        await router.push('/')
+      });
     }
 
     async function fetchAuthors() {

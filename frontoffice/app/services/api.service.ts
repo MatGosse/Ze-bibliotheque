@@ -3,6 +3,7 @@ import type { AbstractEntity } from "~/entities/AbstractEntity";
 export class ApiService {
     public BASE_URL = process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
     public token: string;
+    private toast = useToast()
 
     public constructor(token?: string | null) {
         this.token = token? token : '';
@@ -11,6 +12,10 @@ export class ApiService {
     private async handleResponse<T>(response: Response): Promise<T> {
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
+            this.toast.error({
+                title: 'Erreur',
+                message: errorData.description // @Todo create a service to translate errors to the user
+            })
             throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
         }
         return response.json();

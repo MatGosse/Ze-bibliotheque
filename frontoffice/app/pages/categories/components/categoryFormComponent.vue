@@ -29,9 +29,12 @@ export default defineComponent({
       name: '',
     });
 
-    async function fetchCategory(id: number) {
-      const authorData = await apiService.get(Categories, id);
-      category.name = authorData.name;
+    function fetchCategory(id: number) {
+      apiService.get(Categories, id).then(authorData=>{
+        category.name = authorData.name;
+      }).catch(async ()=>{
+        await router.push('/categories')
+      });
     }
 
 
