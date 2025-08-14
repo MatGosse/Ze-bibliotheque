@@ -1,4 +1,4 @@
-                            ## Prérequis
+## Prérequis
 
 Pour faire fonctionner ce projet, vous devez avoir installé :
 
