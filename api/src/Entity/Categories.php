@@ -8,7 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CategoriesRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    paginationItemsPerPage: 10,
+)]
 class Categories
 {
     #[ORM\Id]
