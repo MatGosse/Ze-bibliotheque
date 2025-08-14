@@ -1,0 +1,126 @@
+import type { AbstractEntity } from "~/entities/AbstractEntity";
+
+export class ApiService {
+    public BASE_URL = process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
+    public token: string;
+
+    public constructor(token?: string | null) {
+        this.token = token? token : '';
+    }
+
+    private async handleResponse<T>(response: Response): Promise<T> {
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    }
+
+    public async getAll<T extends AbstractEntity>(
+        entityClass: new (...args: never[]) => T,
+        page: number = 1,
+        entrypoint?: string
+    ): Promise<{
+        '@context': string,
+        '@id': string,
+        '@type': string,
+        member: T[],
+        totalItems: number,
+    }> {
+        const domain = entrypoint ?? entityClass.name.toLowerCase();
+        const url = `${this.BASE_URL}/${domain}?page=${page}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/ld+json'
+                }
+            });
+
+            return this.handleResponse(response);
+        } catch (error) {
+            throw new Error(`Erreur API (${domain}): ${error}`);
+        }
+    }
+
+    public async get<T extends AbstractEntity>(
+        entityClass: new (...args: never[]) => T,
+        id: number,
+        entrypoint?: string
+    ): Promise<{
+        '@context': string,
+        '@id': string,
+        '@type': string,
+        member: T
+    }> {
+        const domain = entrypoint ?? entityClass.name.toLowerCase();
+        const url = `${this.BASE_URL}/${domain}/${id}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/ld+json'
+                }
+            });
+
+            return this.handleResponse(response);
+        } catch (error) {
+            throw new Error(`Erreur API (${domain}): ${error}`);
+        }
+    }
+
+    public async post<T extends AbstractEntity>(
+        entityClass: new (...args: never[]) => T,
+        payload: Partial<T>,
+        entrypoint?: string
+    ): Promise<T> {
+        const domain = entrypoint ?? entityClass.name.toLowerCase();
+        const url = `${this.BASE_URL}/${domain}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/ld+json',
+                }
+            });
+
+            return this.handleResponse(response);
+        } catch (error) {
+            throw new Error(`Erreur API (${domain}): ${error}`);
+        }
+    }
+
+    public async patch<T extends AbstractEntity>(
+        entityClass: new (...args: never[]) => T,
+        id: number,
+        payload: Partial<T>,
+        entrypoint?: string
+    ): Promise<T> {
+        const domain = entrypoint ?? entityClass.name.toLowerCase();
+        const url = `${this.BASE_URL}/${domain}/${id}`;
+        console.log(payload)
+
+        try {
+            const response = await fetch(url, {
+                method: 'PATCH',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/merge-patch+json',
+                    'Accept': 'application/ld+json'
+                }
+            });
+
+            return this.handleResponse(response);
+        } catch (error) {
+            throw new Error(`Erreur API (${domain}): ${error}`);
+        }
+    }
+}
