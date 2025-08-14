@@ -19,7 +19,8 @@ export class ApiService {
     public async getAll<T extends AbstractEntity>(
         entityClass: new (...args: never[]) => T,
         page: number = 1,
-        entrypoint?: string
+        extraParams?: Record<string, string | number | boolean>,
+        entrypoint?: string,
     ): Promise<{
         '@context': string,
         '@id': string,
@@ -28,7 +29,14 @@ export class ApiService {
         totalItems: number,
     }> {
         const domain = entrypoint ?? entityClass.name.toLowerCase();
-        const url = `${this.BASE_URL}/${domain}?page=${page}`;
+
+        const params = new URLSearchParams({ page: page.toString() });
+        if (extraParams) {
+            for (const [key, value] of Object.entries(extraParams)) {
+                params.append(key, String(value));
+            }
+        }
+        const url = `${this.BASE_URL}/${domain}?${params.toString()}`;
 
         try {
             const response = await fetch(url, {

@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\BooksRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -29,6 +31,7 @@ class Books
     #[ORM\ManyToOne(inversedBy: 'books')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['books:read'])]
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     private ?Authors $author = null;
 
     /**
