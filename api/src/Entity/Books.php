@@ -7,27 +7,35 @@ use App\Repository\BooksRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BooksRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['books:read']],
+    paginationItemsPerPage: 10,
+)]
 class Books
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['books:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['books:read'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'books')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['books:read'])]
     private ?Authors $author = null;
 
     /**
      * @var Collection<int, Categories>
      */
     #[ORM\ManyToMany(targetEntity: Categories::class)]
+    #[Groups(['books:read'])]
     private Collection $categories;
 
     public function __construct()
