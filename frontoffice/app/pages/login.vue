@@ -1,8 +1,15 @@
 <script lang="ts">
   import {LoginService} from "~/services/login.service";
   import {User} from "~/entities/User";
+  import isLoginGuard from "~/middlewares/isLogin.guard";
+
+
+  definePageMeta({
+    middleware: isLoginGuard
+  });
 
   export default {
+
     setup() {
       const loginService = new LoginService();
 

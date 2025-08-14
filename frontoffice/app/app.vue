@@ -16,10 +16,10 @@
               Catégories
             </NuxtLink>
             <NuxtLink v-if="!authToken" to="/login" class="block px-3 py-2 rounded-lg hover:bg-white/20 transition">
-              Connection
+              Connexion
             </NuxtLink>
             <NuxtLink v-else @click="disconnect()" class="block px-3 py-2 rounded-lg hover:bg-white/20 transition">
-              déconnection
+              déconnexion
             </NuxtLink>
         </div>
 
@@ -55,10 +55,10 @@
           Catégories
         </NuxtLink>
         <NuxtLink v-if="!authToken" to="/login" class="block px-3 py-2 rounded-lg hover:bg-white/20 transition">
-          Connection
+          connexion
         </NuxtLink>
         <p @click="disconnect()" v-else class="block px-3 py-2 rounded-lg hover:bg-white/20 transition">
-          déconnection
+          déconnexion
         </p>
       </div>
     </nav>

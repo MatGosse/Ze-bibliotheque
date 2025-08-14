@@ -11,12 +11,10 @@ export const useAuthStore = defineStore('auth', () => {
     const isAuthenticated = computed(() => !!authToken.value)
 
     const setToken = (token: string) => {
-    console.log('kebab');
         authToken.value = token
     }
 
     const clearToken = () => {
-        console.log('kebab 2');
         authToken.value = null
     }
 
